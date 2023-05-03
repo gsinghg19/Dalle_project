@@ -5,12 +5,12 @@ const {
   generateBlobSASQueryParameters,
 } = require("@azure/storage-blob");
 
-const accoutName = process.env.accoutName;
+const accountName = process.env.accountName;
 const accountKey = process.env.accountKey;
 const containerName = "images";
 
 const sharedKeyCredential = new StorageSharedKeyCredential(
-  accoutName,
+  accountName,
   accountKey
 );
 
@@ -25,7 +25,7 @@ async function generateSASToken() {
 
   const permissions = new BlobSASPermissions();
   permissions.write = true;
-  permisions.create = true;
+  permissions.create = true;
   permissions.read = true;
 
   const expiryDate = new Date();
@@ -43,4 +43,4 @@ async function generateSASToken() {
   return sasToken;
 }
 
-module.exorts = generateSASToken;
+module.exports = generateSASToken;
