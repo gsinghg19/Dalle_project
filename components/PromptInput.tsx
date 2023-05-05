@@ -1,7 +1,7 @@
 "use client";
 
-import fetchSuggestionFromChatGPT from "@/lib/fetchSuggestionFromChatGPT";
-import { useState } from "react";
+import fetchSuggestionFromChatGPT from "../lib/fetchSuggestionFromChatGPT";
+import { FormEvent, useState } from "react";
 import useSWR from "swr";
 import { inspect } from "util";
 
@@ -13,17 +13,45 @@ function PromptInput() {
     isLoading,
     mutate,
     isValidating,
-  } = useSWR("/api/suggestion", fetchSuggestionFromChatGPT, {
+  } = useSWR("suggestion", fetchSuggestionFromChatGPT, {
     revalidateOnFocus: false,
   });
 
-  console.log(inspect(suggestion));
+  // console.log(inspect(suggestion));
+  console.log("suggestion is: ", suggestion);
 
-  const loading = isLoading || isValidating;
+  const submitPrompt = async (useSuggestion?: boolean) => {
+    const inputPrompt = input;
+    console.log("sumbit prompt is: ", submitPrompt);
+    setInput("");
+
+    //send prompt to api here
+    const promptToApi = useSuggestion ? suggestion : inputPrompt;
+
+    //make POST request to backend here
+    const res = await fetch("/api/generateImage", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ prompt: promptToApi }),
+    });
+    const data = await res.json();
+  };
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    await submitPrompt();
+  };
+
+  const loading = isValidating || isLoading;
 
   return (
     <div className="m-10">
-      <form className="flex flex-col lg:flex-row shadow-xl shadow-slate-400/30 border rounded-md lg:divide-x ">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col lg:flex-row shadow-xl shadow-slate-400/30 border rounded-md lg:divide-x "
+      >
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -40,13 +68,15 @@ function PromptInput() {
             input
               ? "bg-violet-500 text-white transition-colors duration-200"
               : "text-gray-300 cursor-not-allowed"
-          } font-bold`}
+          } `}
         >
           Generate
         </button>
         <button
           className="p-4 bg-violet-400 text-white transition-colors duration-200 font-bold disabled:text-gray-300 disabled:cursor-not-allowed disabled:bg-gray-400"
           type="button"
+          onClick={() => submitPrompt(true)}
+          disabled={isValidating || isLoading}
         >
           Use Suggestion
         </button>
