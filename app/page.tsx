@@ -1,7 +1,12 @@
+import Images from "@/components/Images";
+import Error from "@/components/Error";
+
 export default function Home() {
   return (
-    <main>
-      <h1 className="">Ai Generator tool</h1>
-    </main>
+    <Error statusCode={404 || 500}>
+      <main className="mx-0">
+        <Images />
+      </main>
+    </Error>
   );
 }
