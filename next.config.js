@@ -4,7 +4,10 @@ const nextConfig = {
     appDir: true,
   },
   images: {
-    domains: ["www.shutterstock.com"],
+    domains: [
+      "www.shutterstock.com",
+      "https://aigeneratorproject7c9683.blob.core.windows.net/",
+    ],
   },
 };
 

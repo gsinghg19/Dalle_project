@@ -1,5 +1,5 @@
-import Images from "@/components/Images";
-import Error from "@/components/Error";
+import Images from "../components/Images";
+import Error from "../components/Error";
 
 export default function Home() {
   return (
