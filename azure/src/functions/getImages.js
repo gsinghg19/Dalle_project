@@ -1,25 +1,31 @@
 const { app } = require("@azure/functions");
 const openai = require("../../lib/openai");
 const generateSASToken = require("../../lib/generateSASToken");
-const { BlobServiceClient } = require("@azure/storage-blob");
+const {
+  BlobServiceClient,
+  StorageSharedKeyCredential,
+} = require("@azure/storage-blob");
 
 const accountName = process.env.accountName;
 const accountKey = process.env.accountKey;
 const containerName = "images";
 
-const sharedKeyCredential = new StorageSharedKeyClient(accountName, accountKey);
+const sharedKeyCredential = new StorageSharedKeyCredential(
+  accountName,
+  accountKey
+);
 
 const blobServiceClient = new BlobServiceClient(
   `https://${accountName}.blob.core.windows.net`,
   sharedKeyCredential
 );
 
-function newAbortSignal(timeoutMs) {
-  const abortController = new AbortController();
-  setTimeout(() => abortController.abort(), timeoutMs || 0);
+// function newAbortSignal(timeoutMs) {
+//   const abortController = new AbortController();
+//   setTimeout(() => abortController.abort(), timeoutMs || 0);
 
-  return abortController.signal;
-}
+//   return abortController.signal;
+// }
 
 app.http("getImages", {
   methods: ["GET"],
@@ -37,5 +43,25 @@ app.http("getImages", {
     }
 
     //TODO: Now split image filenames string (filename is structured as `${fileName}_${timestamp.png}`) to obtain timestamp. Use timestamp to sort images.
+
+    const sortedImageUrls = imageUrlsArr.sort((a, b) => {
+      const aName = a.name
+        .split("_")[1]
+        .toString()
+        .split(".png" || ".jpg" || ".jpeg" || ".svg" || ".webp")[0];
+      const bName = b.name
+        .split("_")[1]
+        .toString()
+        .split(".png" || ".jpg" || ".jpeg" || ".svg" || ".webp")[0];
+      return bName - aName;
+    });
+
+    context.log(`HTTP request made is "${request.url}"`);
+
+    return {
+      jsonBody: {
+        imageUrls: sortedImageUrls,
+      },
+    };
   },
 });
