@@ -4,6 +4,7 @@ import fetchSuggestionFromChatGPT from "../lib/fetchSuggestionFromChatGPT";
 import { FormEvent, useState } from "react";
 import useSWR from "swr";
 import { inspect } from "util";
+import fetchImages from "../lib/fetchImages";
 
 function PromptInput() {
   const [input, setInput] = useState("");
@@ -13,12 +14,16 @@ function PromptInput() {
     isLoading,
     mutate,
     isValidating,
-    error,
   } = useSWR("/api/suggestion", fetchSuggestionFromChatGPT, {
     revalidateOnFocus: false,
   });
 
+  const { mutate: updateImages } = useSWR("images", fetchImages, {
+    revalidateOnFocus: false,
+  });
+
   // console.log(inspect(suggestion));
+  console.log("suggestion is: ==> ", suggestion);
 
   const submitPrompt = async (useSuggestion?: boolean) => {
     const inputPrompt = input;
@@ -28,7 +33,7 @@ function PromptInput() {
     //send prompt to api here
     const promptToApi = useSuggestion
       ? suggestion
-      : inputPrompt || (isLoading && isValidating && suggestion);
+      : inputPrompt || (!isLoading && !isValidating && suggestion);
 
     //make POST request to backend here
     const res = await fetch("/api/generateImage", {
@@ -39,6 +44,14 @@ function PromptInput() {
       body: JSON.stringify({ prompt: promptToApi }),
     });
     const data = await res.json();
+    console.log(data, " <==> :data is here");
+
+    if (data.error) {
+      console.log("error ", data.error);
+    } else {
+      console.log("success ");
+    }
+    updateImages();
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -47,8 +60,6 @@ function PromptInput() {
   };
 
   const loading = isValidating || isLoading;
-
-  console.log("suggestion is: ", suggestion);
 
   return (
     <div className="m-10">
@@ -93,15 +104,6 @@ function PromptInput() {
           New Suggestion
         </button>
       </form>
-
-      {input && (
-        <p className="italic pt-2 pl-2 font-light">
-          Suggestion:{" "}
-          <span className="text-violet-500">
-            {loading ? "ChatGPT is thinking..." : suggestion}
-          </span>
-        </p>
-      )}
     </div>
   );
 }

@@ -26,11 +26,11 @@ app.http("generateImage", {
         prompt: prompt,
         n: 1,
         size: "1024x1024",
+      },
+      {
+        timeout: 20000,
+        signal: newAbortSignal(17000),
       }
-      // {
-      //   timeout: 20000,
-      //   signal: newAbortSignal(17000),
-      // }
     );
 
     //download image data here

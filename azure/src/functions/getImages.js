@@ -19,13 +19,6 @@ const blobServiceClient = new BlobServiceClient(
   sharedKeyCredential
 );
 
-// function newAbortSignal(timeoutMs) {
-//   const abortController = new AbortController();
-//   setTimeout(() => abortController.abort(), timeoutMs || 0);
-
-//   return abortController.signal;
-// }
-
 app.http("getImages", {
   methods: ["GET"],
   authLevel: "anonymous",
