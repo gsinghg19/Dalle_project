@@ -19,8 +19,8 @@ export default function RootLayout({
         <ClientProvider>
           <Header />
           <PromptInput />
+          {children}
         </ClientProvider>
-        {children}
       </body>
     </html>
   );
