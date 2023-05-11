@@ -1,3 +1,5 @@
+// @ts-ignore
+
 import { Configuration, OpenAIApi } from "openAI";
 
 const configuration = new Configuration({
