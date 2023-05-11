@@ -5,6 +5,7 @@ import { FormEvent, useState } from "react";
 import useSWR from "swr";
 import { inspect } from "util";
 import fetchImages from "../lib/fetchImages";
+import toast from "react-hot-toast";
 
 function PromptInput() {
   const [input, setInput] = useState("");
@@ -27,13 +28,19 @@ function PromptInput() {
 
   const submitPrompt = async (useSuggestion?: boolean) => {
     const inputPrompt = input;
-    console.log(inputPrompt);
     setInput("");
 
+    console.log(inputPrompt);
+
     //send prompt to api here
-    const promptToApi = useSuggestion
-      ? suggestion
-      : inputPrompt || (!isLoading && !isValidating && suggestion);
+    const promptToApi = useSuggestion ? suggestion : inputPrompt;
+
+    const notificationPrompt = promptToApi;
+    const notificationPromptShort = notificationPrompt.slice(0, 20);
+
+    const notification = toast.loading(
+      `Ai generator is creating: ${notificationPromptShort}...`
+    );
 
     //make POST request to backend here
     const res = await fetch("/api/generateImage", {
@@ -47,9 +54,13 @@ function PromptInput() {
     console.log(data, " <==> :data is here");
 
     if (data.error) {
-      console.log("error ", data.error);
+      toast.error(data.error, {
+        id: notification,
+      });
     } else {
-      console.log("success ");
+      toast.success("Your Ai generated art has been created!", {
+        id: notification,
+      });
     }
     updateImages();
   };
