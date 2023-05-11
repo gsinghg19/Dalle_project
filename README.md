@@ -17,4 +17,4 @@ To access azure cloud function endpoints, cd into the azure folder which is in t
 - react-hot-toast
 - node.js v18.0.0
 
-This project has been deployed on vercel.
+This project has been deployed on vercel. visit https://dalle-project-vert.vercel.app/ 
